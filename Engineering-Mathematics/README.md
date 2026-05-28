@@ -25,4 +25,4 @@ A major highlight of this project is demonstrating how the sampling theorem dict
 **Video Presentation:** Due to GitHub's file size limits for media assets, the high-definition recorded presentation is hosted securely on Google Drive.
 **Language Note:** Please note that while the repository documentation is in English, the final video presentation and research discussion are delivered in **Persian (فارسی)**.
 
-[**Watch the Full Video Presentation on Google Drive **](https://drive.google.com/file/d/1G5XNtvLQjFOQXdnJPuheBMlEgmqPN6Rc/view)
+[Watch the Full Video Presentation on Google Drive](https://drive.google.com/file/d/1G5XNtvLQjFOQXdnJPuheBMlEgmqPN6Rc/view)
