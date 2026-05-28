@@ -1,0 +1,210 @@
+clear all;
+
+[file,path]=uigetfile({'*.jpg;*.bmp;*.png;*.tif'},'Choose an image');
+s=[path,file];
+img = imread(s);
+gSizeIMG = imresize(img,[300,500]);
+imshow(gSizeIMG);
+size(gSizeIMG)
+grayimg= mygrayfun(gSizeIMG);
+figure;  
+imshow(grayimg, []);  
+title('Grayscale Image'); 
+level = graythresh(grayimg);
+binaryimg= mybinaryfun(grayimg);
+figure;  
+imshow(binaryimg, []);  
+title('Binary Image'); 
+%% 
+%fixedImg=bwareaopen(binaryimg,threshold);
+%figure;  
+%imshow(fixedImg, []);  
+%title('fixed binary Image'); 
+%disp(fixedImg);
+
+
+%labeledImg = bwlabel(fixedImg);
+%figure;  
+%imshow(labeledImg, []);  
+%title('fixed binary Image'); 
+%disp(labeledImg);
+
+
+% حذف نواحی کوچک  
+%fixedImg = bwareaopen(binaryimg, threshold);  
+
+picture_removed_trash=myremovecom(binaryimg,350);
+figure;
+imshow(~picture_removed_trash)
+title('تمیز شده');
+backgroud=myremovecom(picture_removed_trash,3000);
+figure;
+imshow(backgroud)
+title('پس زمینه');
+pic_back_rem=picture_removed_trash-backgroud;
+figure;
+title('Cleared minus Background');
+imshow(~pic_back_rem);
+
+
+figure;
+imshow(~pic_back_rem, 'InitialMagnification', 'fit'); % نمایش تصویر  
+title('Rectangled');  
+
+[L, Ne] = mysegmentation(pic_back_rem);  
+propied = regionprops(L, 'BoundingBox');  
+
+
+for n = 1:size(propied, 1)  
+
+    rectangle('Position', propied(n).BoundingBox, 'EdgeColor', 'r', 'LineWidth', 3);  
+end  
+%%%%%%%%%
+%%
+
+
+load TRAININGSET;
+totalLetters=size(TRAIN,2);
+
+figure
+final_output=[];
+t=[];
+for n=1:Ne
+
+    
+    [r,c]=find(L==n);
+    Y=pic_back_rem(min(r):max(r),min(c):max(c));
+    imshow(~Y)
+    Y=imresize(Y,[42,24]);
+    imshow(~Y)
+    pause(0.2)
+    
+    %%
+    ro=zeros(1,totalLetters);
+    for k=1:totalLetters   
+        ro(k)=corr2(TRAIN{1,k},Y);
+    end
+%%
+    [MAXRO,pos]=max(ro);
+    if MAXRO>.45
+        out=cell2mat(TRAIN(2,pos));       
+        final_output=[final_output out];
+    end
+end
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+file = fopen('number_Plate.txt', 'wt');
+fprintf(file,'%s\n',final_output);
+fclose(file);
+winopen('number_Plate.txt')
+
+%%
+
+function y = mygrayfun(x)
+
+    if size(x, 3) == 3  
+        y = x(:,:,1)*0.299+ x(:,:,2)*0.578+ x(:,:,3)*0.114;
+    else
+        y = x;
+    end
+end
+
+function y = mybinaryfun(x)
+    y=x;
+    for i = 1:size(y,1)
+        for j = 1:size(y,2)
+            if y(i,j,1)>=100
+                y(i,j,1)=0;
+            else
+                y(i,j,1)=1;
+            end
+        end
+    end
+end
+
+function pic=myremovecom(picture,n)
+    
+[row,column]=find(picture==1);
+POINTS=[row';column'];
+POINTS_NUM=size(POINTS,2);
+pic2=picture;
+while POINTS_NUM>0
+   point_ini=POINTS(:,1);  
+   POINTS(:,1)=[];
+   %
+   POINTS_NUM=size(POINTS,2);
+   diff= abs(repmat(point_ini,1,POINTS_NUM)-POINTS);
+   index=find(diff(1,:)<=1 & diff(2,:)<=1);
+   newpoints=POINTS(:,index);
+   POINTS(:,index)=[];
+
+   current_obj=[point_ini newpoints];
+   newpoints_len=size(newpoints,2);
+
+   while newpoints_len>0
+        POINTS_NUM=size(POINTS,2);
+        diff= abs(repmat(newpoints(:,1),1,POINTS_NUM)-POINTS);
+        index=find(diff(1,:)<=1 & diff(2,:)<=1);
+        newpoints1=POINTS(:,index);
+        POINTS(:,index)=[];
+
+        newpoints(:,1)=[];
+        newpoints=[newpoints newpoints1];
+        current_obj=[current_obj newpoints1];
+        newpoints_len=size(newpoints,2);
+   end
+    if size(current_obj,2) < n
+        pics=pic2;
+        ind=sub2ind(size(picture),current_obj(1,:),current_obj(2,:));
+        pics(ind)=0;
+        pic2=pics;
+    end
+   POINTS_NUM=size(POINTS,2);
+end
+pic=pic2;
+end
+
+
+
+
+
+function [L,Ne]=mysegmentation(picture)
+    L=zeros(size(picture));
+    [row,column]=find(picture==1);
+    POINTS=[row';column'];
+    current_obj_num=1;
+    POINTS_NUM=size(POINTS,2);
+    while POINTS_NUM>0
+        point_ini=POINTS(:,1);  
+        POINTS(:,1)=[];
+        
+       POINTS_NUM=size(POINTS,2);
+       diff= abs(repmat(point_ini,1,POINTS_NUM)-POINTS);
+       index=find(diff(1,:)<=1 & diff(2,:)<=1);
+       newpoints=POINTS(:,index);
+       POINTS(:,index)=[];
+
+        current_obj=[point_ini newpoints];
+        newpoints_len=size(newpoints,2);
+        while newpoints_len>0
+            POINTS_NUM=size(POINTS,2);
+            diff= abs(repmat(newpoints(:,1),1,POINTS_NUM)-POINTS);
+            index=find(diff(1,:)<=1 & diff(2,:)<=1);
+            newpoints1=POINTS(:,index);
+            POINTS(:,index)=[];
+            newpoints(:,1)=[];
+            newpoints=[newpoints newpoints1];
+            current_obj=[current_obj newpoints1];
+            newpoints_len=size(newpoints,2);
+           end
+        ind=sub2ind(size(picture),current_obj(1,:),current_obj(2,:));
+        L(ind)=current_obj_num;
+        current_obj_num=current_obj_num+1;
+        POINTS_NUM=size(POINTS,2);
+    end
+    Ne=current_obj_num-1;
+
+end
