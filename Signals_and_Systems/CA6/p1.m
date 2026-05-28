@@ -1,0 +1,263 @@
+clear all;
+clc;
+fc=5;
+fs = 100;
+t1 = 0:1/fs:1-1/fs;
+
+x1=cos(2*pi*fc*t1);
+figure;
+plot(t1,x1);
+%%
+
+
+c= physconst('Lightspeed');
+BETA = 0.3;
+ALPHA = 0.5;
+V= 180/3.6;
+R= 250*1000;
+RHO  = 2/c;
+td= RHO*R;
+
+fd = BETA*V;
+y1=ALPHA*cos(2*pi*(fc+fd)*(t1-td));
+
+figure;
+plot(t1,y1);
+%%
+
+Y = fftshift(fft(y1));
+
+N=1*fs;
+f1= -fs/2:fs/N:fs/2-fs/N;
+Y = Y/max(abs(Y));
+figure;
+plot(f1,abs(Y));
+% 
+figure ;    
+plot(f1,angle(Y));
+Yfsize = length(Y);
+half_idx = (floor(Yfsize/2)+2):Yfsize;
+Z=Y(half_idx);
+idx = find(Z > 0.1 ) ;
+
+f_new = idx;
+phi_new = angle(Z(idx));
+f_d_find = f_new - fc;
+
+t_d_find = phi_new / (-2*pi*(f_d_find+fc));
+
+
+%%
+flag_t_d = 0;
+flag_f_d = 0;
+for i =  0.001:0.02:100
+
+    noisedy1 = y1 + 0.01*i*(randn(1,length(y1)));
+
+    NoisedY =  fftshift(fft(noisedy1));
+    NoisedY=NoisedY/max(abs(NoisedY));
+    noisedZ=NoisedY(half_idx);
+    [maxVal , jdx] = max(noisedZ);
+    f_new_noised = jdx;
+    phi_new_noised = angle(noisedZ(jdx));
+    f_d_find_noised = f_new_noised - fc;
+    
+    t_d_find_noised = phi_new_noised / (-2*pi*(f_d_find_noised+fc));
+
+
+    if t_d_find_noised ~= t_d_find &&  flag_t_d == 0 
+        fprintf('wrong finded t_d  for i= %d is: %f\n: ' , i,t_d_find_noised);
+        fprintf('wrong finded R is: %f km\n: ' , t_d_find_noised/(1000*RHO));
+
+        flag_t_d = 1;
+    end
+    
+    if f_d_find_noised ~= f_d_find &&  flag_f_d == 0 
+       fprintf('wrong finded f_d  for i= %d is: %f\n: ' , i,f_d_find_noised);
+       fprintf('wrong finded V is: %f km/h\n: ' , f_d_find_noised/BETA*3.6);
+        flag_f_d = 1;
+    end
+end
+%%
+R1 = 250*1000;
+R2 = 200*1000;
+V1 = 180/3.6;
+V2 = 216/3.6;
+ALPHA1 = 0.5;
+ALPHA2 = 0.6;
+td1 = RHO*R1;
+td2 = RHO*R2;
+fd1 = BETA*V1;
+fd2 = BETA*V2;
+
+y_1 =  ALPHA1*cos(2*pi*(fc+fd1)*(t1-td1));
+y_2 = ALPHA2*cos(2*pi*(fc+fd2)*(t1-td2));
+
+y_f = y_1 + y_2 ; 
+figure;
+plot(t1,y_f);
+%%
+YF = fftshift(fft(y_f));
+YF = YF/max(abs(YF));
+ZF = YF(half_idx);
+figure;
+plot(f1, abs(YF));
+
+kdx = find(ZF>0.1);
+f1_new = kdx(1);
+f2_new = kdx(2);
+phi1_new = angle(ZF(kdx(1)));
+phi2_new = angle(ZF(kdx(2)));   
+
+fd1_find = f1_new - fc;
+fd2_find = f2_new - fc;
+td_find1 = phi1_new / (-2*pi*(fd1_find+fc));
+td_find2 = phi2_new / (-2*pi*(fd2_find+fc));
+V1_find = fd1_find/BETA ; V2_find= fd2_find/BETA ; R1_find=td_find1/RHO ; R2_find = td_find2/RHO ;
+%%
+R3 = 250*1000;
+R4 = 200*1000;
+V3 = 144/3.6;
+V4 = (144)/3.6;
+
+td3 = RHO*R3;
+td4 = RHO*R4;
+fd3 = BETA*V3;
+fd4 = BETA*V4;
+
+y_3 =  ALPHA1*cos(2*pi*(fc+fd3)*(t1-td3));
+y_4 = ALPHA2*cos(2*pi*(fc+fd4)*(t1-td4));
+
+y_f2 = y_3 + y_4 ; 
+figure;
+plot(t1,y_f2);
+
+YF2= fftshift(fft(y_f2));
+YF2 = YF2/max(abs(YF2));
+ZF2 = YF2(half_idx);
+figure;
+plot(f1, abs(YF2));
+
+udx = find(ZF2>0.1);
+f3_new = udx(1);
+if length(udx)>1
+    f4_new = udx(2);
+    phi4_new = angle(ZF2(udx(2)));
+
+else
+    f4_new = udx(1);
+    phi4_new = angle(ZF2(udx(1)));
+end
+phi3_new = angle(ZF2(udx(1)));
+% phi4_new = angle(ZF2(udx(2)));
+
+fd3_find = f3_new - fc;
+fd4_find = f4_new - fc;
+td_find3 = phi3_new / (-2*pi*(fd3_find+fc));
+td_find4 = phi4_new / (-2*pi*(fd4_find+fc));
+V3_find = fd3_find / BETA;
+V4_find = fd4_find / BETA;
+R3_find = td_find3 / RHO;
+R4_find = td_find4 / RHO;
+
+%%
+R5 = 150*1000;
+R6 = 150*1000;
+V5 = 144/3.6;
+V6 = 216/3.6;
+ALPHA5 = 0.5;
+ALPHA6 = 0.6;
+td5 = RHO*R5;
+td6 = RHO*R6;
+fd5 = BETA*V5;
+fd6 = BETA*V6;
+
+y_5 =  ALPHA1*cos(2*pi*(fc+fd5)*(t1-td5));
+y_6 = ALPHA2*cos(2*pi*(fc+fd6)*(t1-td6));
+
+y_f22 = y_5 + y_6 ; 
+figure;
+plot(t1,y_f22);
+
+YF22 = fftshift(fft(y_f22));
+YF22 = YF22/max(abs(YF22));
+ZF22 = YF22(half_idx);
+figure;
+plot(f1, abs(YF22));
+
+edx = find(ZF22 > 0.1);
+f5_new = edx(1);
+if length(edx) > 1
+    f6_new = edx(2);
+    phi6_new = angle(ZF22(edx(2)));
+else
+    f6_new = edx(1);
+    phi6_new = angle(ZF22(edx(1)));
+end
+phi5_new = angle(ZF22(edx(1)));
+
+fd5_find = f5_new - fc;
+fd6_find = f6_new - fc;
+td_find5 = phi5_new / (-2*pi*(fd5_find + fc));
+td_find6 = phi6_new / (-2*pi*(fd6_find + fc));
+V5_find = fd5_find / BETA;
+V6_find = fd6_find / BETA;
+R5_find = td_find5 / RHO;
+R6_find = td_find6 / RHO;
+%%
+
+R7 = 250*1000;
+R8 = 260*1000;
+R9 = 170*1000;
+V7 = 144/3.6;
+V8= 180/3.6;
+V9= 252/3.6;
+ALPHA3 = 0.4;
+
+td7 = RHO * R7;
+td8 = RHO * R8;
+td9 = RHO * R9;
+
+fd7 = BETA * V7;
+fd8 = BETA * V8;
+fd9 = BETA * V9;
+
+y_7 = ALPHA1 * cos(2 * pi * (fc + fd7) * (t1 - td7));
+y_8 = ALPHA2 * cos(2 * pi * (fc + fd8) * (t1 - td8));
+y_9 = ALPHA3 * cos(2 * pi * (fc + fd9) * (t1 - td9));
+
+y_fn = y_7 + y_8 + y_9;
+
+
+YFN = fftshift(fft(y_fn));
+YFN = YFN / max(abs(YFN));
+ZFN = YFN(half_idx);
+
+pdx = find(ZFN > 0.1);
+n = length(pdx); 
+
+
+f_n_new = zeros(1, n);
+phi_n_new = zeros(1, n);
+fd_find = zeros(1, n);
+td_find = zeros(1, n);
+V_find = zeros(1, n);
+R_find = zeros(1, n);
+
+for i = 1:n
+    f_n_new(i) = pdx(i);
+    phi_n_new(i) = angle(ZFN(pdx(i)));
+    fd_find(i) = f_n_new(i) - fc;
+    td_find(i) = phi_n_new(i) / (-2*pi*(fd_find(i) + fc));
+    V_find(i) = fd_find(i) / BETA;
+    R_find(i) = td_find(i) / RHO;
+end
+
+disp('Frequencies found:');
+disp(fd_find);
+disp('Velocities found:');
+disp(V_find);
+disp('Ranges found :');
+disp(R_find);
+disp('t_delays found :');
+disp(td_find);
