@@ -1,4 +1,4 @@
-# Signals and Systems - Computer Assignments
+# Signals and Systems - Computer Assignments (Spring 2025)
 
 This repository contains the MATLAB implementations, Simulink models, and project reports for the 7 computer assignments (CAs) of the Signals and Systems course at the University of Tehran.
 
