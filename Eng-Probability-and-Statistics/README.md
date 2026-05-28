@@ -6,14 +6,14 @@ This repository contains the computer assignments and numerical simulations comp
 
 ## Repository Structure
 
-### 1. [Computer Assignment 0](./CA0/) - Descriptive Statistics & Fundamental Distributions
-* Computational exploration of datasets, statistical moments, and the validation of standard discrete and continuous probability distributions.
+### 1. [Computer Assignment 0](./CA0/) - Foundations of NumPy & Bayesian Inference
+* Computational workflows using NumPy, voting process simulations, and the implementation of a Naive Bayes classifier with Laplace smoothing for text classification.
 
-### 2. [Computer Assignment 1](./CA1/) - Queue Simulation & Bayesian Estimation
-* Implementation of sequential Bayesian parameter updating (Beta-Binomial models), discrete-event queue modeling, and seasonal data correlation analysis.
+### 2. [Computer Assignment 1](./CA1/) - Statistical Distributions & Stochastic Transformations
+* Exploratory data analysis, simulating the St. Petersburg paradox, and transforming uniform distributions into continuous exponential and Gaussian distributions via the Box-Muller method.
 
-### 3. [Computer Assignment 2](./CA2/) - Asymptotic Theorems & Optimization
-* Numerical proof of the Central Limit Theorem, multi-dimensional Mean Squared Error (MSE) surface analysis, and empirical confidence interval mapping.
+### 3. [Computer Assignment 2](./CA2/) - Queue Simulation & Bayesian Parameter Estimation
+* Iterative Bayesian parameter tracking using Beta-Binomial conjugate priors, discrete-event single-server queue simulations, and seasonal time-series correlation analysis.
 
-### 4. [Computer Assignment 3](./CA3/) - Hypothesis Testing & Advanced Inference
-* Applying parametric and non-parametric statistical hypothesis tests to experimental engineering datasets and evaluating error decision thresholds.
+### 4. [Computer Assignment 3](./CA3/) - Asymptotic Convergence & Optimization Models
+* Empirical validation of the Central Limit Theorem (CLT), geometric multi-dimensional analysis of the Mean Squared Error (MSE) loss surface, and mapping statistical confidence bounds.
