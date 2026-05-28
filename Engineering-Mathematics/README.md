@@ -1,4 +1,4 @@
-# Nyquist-Shannon Sampling Theorem & Biomedical Applications
+# Nyquist-Shannon Sampling Theorem & Biomedical Applications - Winter 2024
 
 This folder contains the core research documentation, analytical models, and presentation details regarding the **Nyquist-Shannon Sampling Theorem** and its critical role in advanced medical imaging systems.
 
